@@ -1,0 +1,3 @@
+// Palace Types
+export const PALACE_UPDATE_STEP = "PALACE_UPDATE_STEP";
+export const PALACE_SETUP_GAME = "PALACE_SETUP_GAME";
