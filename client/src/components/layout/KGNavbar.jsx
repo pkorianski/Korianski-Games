@@ -13,18 +13,16 @@ import {
   DropdownToggle,
   DropdownMenu,
   DropdownItem,
-  NavbarText
+  NavbarText,
 } from "reactstrap";
 
-const KGNavbar = props => {
+const KGNavbar = (props) => {
   const [isOpen, setIsOpen] = useState(false);
   const toggle = () => setIsOpen(!isOpen);
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-  const dropdownToggle = () => setDropdownOpen(!dropdownOpen);
 
   return (
     <div>
-      <Navbar fixed="top" sticky="top" color="dark" light expand="md">
+      <Navbar fixed="top" sticky="top" color="dark" light expand="xl">
         <NavbarBrand
           style={{ color: "white" }}
           className="navbar-brand"
@@ -45,14 +43,14 @@ const KGNavbar = props => {
                 ABOUT US
               </NavLink>
             </NavItem>
-            <Dropdown nav isOpen={dropdownOpen} toggle={dropdownToggle}>
+            <UncontrolledDropdown nav inNavbar>
               <DropdownToggle style={{ color: "white" }} nav caret>
                 PLAY
               </DropdownToggle>
               <DropdownMenu right>
                 <DropdownItem href="/palace">Palace</DropdownItem>
               </DropdownMenu>
-            </Dropdown>
+            </UncontrolledDropdown>
           </Nav>
           <NavbarText className="navbar-text" style={{ color: "white" }}>
             NEW USER?
