@@ -1,37 +1,68 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import {
-  Container,
-  InputGroup,
-  InputGroupAddon,
-  InputGroupText,
   Input,
   Label,
   Form,
   FormGroup,
   Button,
-  Modal,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
+  Container,
+  InputGroup,
 } from "reactstrap";
 import { connect } from "react-redux";
 import { Link } from "react-router-dom";
-import Palace from "../../../../actions/games/palace/Palace";
 import faker from "faker";
-import VisibleCardStack from "../Board/VisibleCardStack";
+import Palace from "../../../../actions/games/palace/Palace";
+import { random } from "../../../common";
 
 // Palace Board
 import Board from "../Board/Board";
-import UserController from "../Controller/UserController";
-import TopCards from "../Board/TopCards";
+
+// Shareables
+import GameHeader from "../shareable/GameHeader";
+import SelectCharacter from "../shareable/SelectCharacter";
+import CardController from "../shareable/CardController";
+
+// Wizard
+import StartGame from "../wizards/StartGame";
 
 // Actions
-import { updateStep } from "../../../../actions/games/palace/solo/game";
-import { setupGame } from "../../../../actions/games/palace/solo/game";
+import {
+  setupGame,
+  updateStep,
+  updatePlayerTurn,
+} from "../../../../actions/games/palace/solo/game";
 
-const PalaceSoloBoard = ({ cards_selected, step, updateStep, setupGame }) => {
+const PalaceSoloBoard = ({
+  step,
+  updateStep,
+  setupGame,
+  playerTurn,
+  updatePlayerTurn,
+}) => {
+  const characters = [
+    "Centaur",
+    "Elf",
+    "Fairy",
+    "Grim",
+    "King",
+    "Knight",
+    "Monster",
+    "Orc",
+    "Spider",
+    "Witch",
+    "Tree",
+    "Unicorn",
+    "Viking",
+    "Villager",
+    "Werewolf",
+  ];
   let [game, setGame] = useState(null);
+
+  // Game init state
+  const [selectedChar, setSelectedChar] = useState(null);
+  const [charModal, setCharModal] = useState(false);
+  const toggleChar = () => setCharModal(!charModal);
 
   const beginGame = () => {
     game.set_deck();
@@ -42,17 +73,18 @@ const PalaceSoloBoard = ({ cards_selected, step, updateStep, setupGame }) => {
 
   const onSubmitGame = async (e) => {
     e.preventDefault();
-    let numberOfOpponents = e.target.numberOfOpponents.value;
-    setupGame(e.target.yourPlayer.value, numberOfOpponents);
+    setupGame(e.target.yourPlayer.value);
     updateStep(step);
 
     setGame(
       new Palace(
-        e.target.numberOfOpponents.value,
-        e.target.yourPlayer.value,
-        faker.internet.userName(),
-        numberOfOpponents > 2 ? faker.internet.userName() : null,
-        numberOfOpponents > 3 ? faker.internet.userName() : null
+        { name: e.target.yourPlayer.value, img: selectedChar.img },
+        {
+          name: faker.internet.userName().slice(0, 12),
+          img: `${process.env.PUBLIC_URL}/players/${
+            characters[Math.floor(random(1, characters.length)) - 1]
+          }-icon.png`,
+        }
       )
     );
   };
@@ -66,44 +98,71 @@ const PalaceSoloBoard = ({ cards_selected, step, updateStep, setupGame }) => {
           <Input type="text" id="yourPlayer" placeholder="username" required />
         </FormGroup>
         <FormGroup>
-          <Label for="numberOfOpponents">Number of Opponents</Label>
-          <Input type="select" name="select" id="numberOfOpponents">
-            <option>1</option>
-            <option>2</option>
-            <option>3</option>
-          </Input>
+          <Label for="playerImg">Pick Your Character</Label>
+          <InputGroup id="playerImg">
+            <Button className="kg-font" type="button" onClick={toggleChar}>
+              Choose
+            </Button>
+            {selectedChar && (
+              <span style={{ marginLeft: "1em" }}>
+                {selectedChar.name}
+                <img
+                  style={{
+                    marginLeft: "0.5em",
+                    width: "2.5em",
+                    height: "2.5em",
+                    backgroundColor: "#00cc66",
+                    borderRadius: "50%",
+                    border: "1px solid black",
+                    padding: "0.2em",
+                  }}
+                  src={selectedChar.img}
+                  alt=""
+                />
+              </span>
+            )}
+          </InputGroup>
         </FormGroup>
         <Link to="/palace/howto">Don't remember the rules? Review here</Link>
         <Button id="play-button" color="success">
           <div id="play-button-text">PLAY</div>
         </Button>
       </Form>
+      <SelectCharacter
+        charModal={charModal}
+        toggleChar={toggleChar}
+        handleClick={setSelectedChar}
+      />
     </div>
   );
 
+  useEffect(() => {
+    if (
+      game !== null &&
+      step === 5 &&
+      playerTurn === game.player2.player_name &&
+      game.player2.isRobot
+    ) {
+      game.robotTurn();
+      updatePlayerTurn(game.player1.player_name);
+    }
+    // eslint-disable-next-line
+  }, [playerTurn]);
+
   return (
     <Container>
-      <h1
-        className="game-title"
-        style={{ textAlign: "center", marginTop: "1em" }}
-      >
-        {"Palace (Solo Play)".toUpperCase()}
-      </h1>
+      <GameHeader />
 
       {step === 1 && initGame()}
       {step === 2 && beginGame()}
       {step >= 3 && (
         <div>
-          <h6 style={{ textAlign: "center" }}>TURN: Player X</h6>
-          <Board
-            player1={game.player1}
-            player2={game.player2}
-            playet3={game.player3}
-            player4={game.player4}
+          <Board step={step} game={game} />
+          <StartGame game={game} />
+          <CardController
+            current_hand={step >= 5 ? game.player1.current_hand : []}
+            game={game}
           />
-          <UserController />
-          <TopCards current_hand={game.player1.current_hand} game={game} />
-          {game.players()}
         </div>
       )}
     </Container>
@@ -114,13 +173,17 @@ PalaceSoloBoard.propTypes = {
   step: PropTypes.number.isRequired,
   updateStep: PropTypes.func.isRequired,
   setupGame: PropTypes.func.isRequired,
+  playerTurn: PropTypes.string,
+  updatePlayerTurn: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = (state) => ({
   step: state.games.palace.step,
-  cards_selected: state.games.palace.cards_selected,
+  playerTurn: state.games.palace.playerTurn,
 });
 
-export default connect(mapStateToProps, { updateStep, setupGame })(
-  PalaceSoloBoard
-);
+export default connect(mapStateToProps, {
+  updateStep,
+  setupGame,
+  updatePlayerTurn,
+})(PalaceSoloBoard);

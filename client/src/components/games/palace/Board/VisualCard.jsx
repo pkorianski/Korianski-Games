@@ -11,8 +11,15 @@ const VisualCard = ({
   removeSelectedCard,
   card,
   clickable,
+  cardWidth,
+  cardHeight,
 }) => {
   let [enabled, setEnabled] = useState(false);
+  // eslint-disable-next-line
+  let [defaults, setDefaults] = useState({
+    width: cardWidth !== undefined ? cardWidth : "3.5em",
+    height: cardHeight !== undefined ? cardHeight : "5em",
+  });
 
   const onClick = () => {
     if (clickable) {
@@ -28,16 +35,16 @@ const VisualCard = ({
   const style = () => {
     if (enabled) {
       return {
-        width: "3.5em",
-        height: "5em",
+        width: defaults.width,
+        height: defaults.height,
         borderStyle: "solid",
         marginRight: "0.5em",
       };
     }
 
     return {
-      width: "3.5em",
-      height: "5em",
+      width: defaults.width,
+      height: defaults.height,
       marginRight: "0.5em",
     };
   };

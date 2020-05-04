@@ -6,17 +6,13 @@ import {
   NavbarToggler,
   NavbarBrand,
   Nav,
-  NavItem,
-  NavLink,
   UncontrolledDropdown,
-  Dropdown,
   DropdownToggle,
   DropdownMenu,
   DropdownItem,
-  NavbarText,
 } from "reactstrap";
 
-const KGNavbar = (props) => {
+const KGNavbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const toggle = () => setIsOpen(!isOpen);
 
@@ -32,29 +28,16 @@ const KGNavbar = (props) => {
         </NavbarBrand>
         <NavbarToggler onClick={toggle} />
         <Collapse isOpen={isOpen} navbar>
-          <Nav className="mr-auto" navbar>
-            <NavItem className="nav-item">
-              <NavLink href="/" style={{ color: "white" }}>
-                HOME
-              </NavLink>
-            </NavItem>
-            <NavItem>
-              <NavLink href="/about" style={{ color: "white" }}>
-                ABOUT US
-              </NavLink>
-            </NavItem>
+          <Nav className="ml-auto" navbar>
             <UncontrolledDropdown nav inNavbar>
               <DropdownToggle style={{ color: "white" }} nav caret>
-                PLAY
+                OUR GAMES
               </DropdownToggle>
               <DropdownMenu right>
                 <DropdownItem href="/palace">Palace</DropdownItem>
               </DropdownMenu>
             </UncontrolledDropdown>
           </Nav>
-          <NavbarText className="navbar-text" style={{ color: "white" }}>
-            NEW USER?
-          </NavbarText>
         </Collapse>
       </Navbar>
     </div>

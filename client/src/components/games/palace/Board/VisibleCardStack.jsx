@@ -27,7 +27,7 @@ const VisibleCardStack = ({ cards, clickable, visible }) => {
 
 VisibleCardStack.propTypes = {
   cards: PropTypes.array.isRequired,
-  visible: PropTypes.func.isRequired,
+  visible: PropTypes.bool.isRequired,
 };
 
 export default VisibleCardStack;

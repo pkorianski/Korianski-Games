@@ -3,11 +3,19 @@ import {
   PALACE_SETUP_GAME,
   ADD_SELECTED_CARD,
   REMOVE_SELECTED_CARD,
-  SET_TOP_CARDS,
+  REMOVE_ALL_SELECTED_CARDS,
+  UPDATE_PLAYER_TURN,
 } from "../../../types";
 // import { createGameDeck } from "../Palace";
 
 // Export Methods
+export const updatePlayerTurn = (playerName) => async (dispatch) => {
+  dispatch({
+    type: UPDATE_PLAYER_TURN,
+    payload: playerName,
+  });
+};
+
 export const updateStep = (step) => async (dispatch) => {
   dispatch({
     type: PALACE_UPDATE_STEP,
@@ -15,12 +23,11 @@ export const updateStep = (step) => async (dispatch) => {
   });
 };
 
-export const setupGame = (username, numberOfOpponents) => async (dispatch) => {
+export const setupGame = (username) => async (dispatch) => {
   dispatch({
     type: PALACE_SETUP_GAME,
     payload: {
       username,
-      numberOfOpponents,
       current_deck: [],
     },
   });
@@ -40,9 +47,8 @@ export const removeSelectedCard = (card) => async (dispatch) => {
   });
 };
 
-export const setTopCards = (cards) => async (dispatch) => {
+export const removeAllSelectedCards = () => async (dispatch) => {
   dispatch({
-    type: SET_TOP_CARDS,
-    payload: cards,
+    type: REMOVE_ALL_SELECTED_CARDS,
   });
 };

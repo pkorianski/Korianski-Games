@@ -1,9 +1,12 @@
-import React from "react";
+import React, { Fragment } from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
-import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from "reactstrap";
-import VisibleCardStack from "./VisibleCardStack";
-import { updateStep } from "../../../../actions/games/palace/solo/game";
+import { Button, ModalHeader, ModalBody, ModalFooter } from "reactstrap";
+import VisibleCardStack from "../Board/VisibleCardStack";
+import {
+  updateStep,
+  removeAllSelectedCards,
+} from "../../../../actions/games/palace/solo/game";
 
 const TopCards = ({
   who_am_i,
@@ -12,6 +15,7 @@ const TopCards = ({
   step,
   game,
   updateStep,
+  removeAllSelectedCards,
 }) => {
   const onClick = () => {
     if (game.player1.player_name === who_am_i) {
@@ -37,11 +41,12 @@ const TopCards = ({
     }
 
     game.pick_top_three();
+    removeAllSelectedCards();
     updateStep(step);
   };
 
   return (
-    <Modal className="modal-dialog-centered" isOpen={step == 3}>
+    <Fragment>
       <ModalHeader className="kg-font">Choose Your Top 3 Cards</ModalHeader>
       <ModalBody style={{ height: "20em" }}>
         <h6 className="kg-font">Available Cards:</h6>
@@ -84,13 +89,13 @@ const TopCards = ({
             </Button>
           </div>
         )}
-        {cards_selected.length == 3 && (
+        {cards_selected.length === 3 && (
           <Button onClick={onClick} className="kg-font" color="primary" outline>
             Select Cards
           </Button>
         )}
       </ModalFooter>
-    </Modal>
+    </Fragment>
   );
 };
 
@@ -100,6 +105,7 @@ TopCards.propTypes = {
   current_hand: PropTypes.array.isRequired,
   who_am_i: PropTypes.string.isRequired,
   updateStep: PropTypes.func.isRequired,
+  removeAllSelectedCards: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = (state) => ({
@@ -108,4 +114,6 @@ const mapStateToProps = (state) => ({
   who_am_i: state.games.palace.who_am_i,
 });
 
-export default connect(mapStateToProps, { updateStep })(TopCards);
+export default connect(mapStateToProps, { updateStep, removeAllSelectedCards })(
+  TopCards
+);

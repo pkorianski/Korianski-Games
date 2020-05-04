@@ -1,9 +1,8 @@
 import React from "react";
-import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
-import { Container, Row, Col, Button } from "reactstrap";
+import { Container, Row, Button } from "reactstrap";
 
-const PalaceMain = props => {
+const PalaceMain = () => {
   return (
     <Container fluid>
       <h1 style={{ textAlign: "center", marginTop: "1em" }}>Palace</h1>
@@ -44,7 +43,5 @@ const PalaceMain = props => {
     </Container>
   );
 };
-
-PalaceMain.propTypes = {};
 
 export default PalaceMain;
