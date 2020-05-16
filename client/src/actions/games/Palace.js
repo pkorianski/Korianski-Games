@@ -289,4 +289,17 @@ export default class Palace {
   robotTurn() {
     console.log("Robot turn");
   }
+
+  clearTable() {
+    this.table_cards = [];
+  }
+
+  addTableCardsToHand(playerName) {
+    if (this.player1.player_name === playerName) {
+      this.player1.current_hand.push(...this.table_cards);
+      console.log(this.player1.current_hand);
+    } else {
+      this.player2.current_hand.push(...this.table_cards);
+    }
+  }
 }

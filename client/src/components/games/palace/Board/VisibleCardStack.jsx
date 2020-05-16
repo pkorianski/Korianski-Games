@@ -5,10 +5,8 @@ import VisualCard from "./VisualCard";
 const VisibleCardStack = ({ cards, clickable, visible }) => {
   let style = {};
   if (visible) {
-    console.log("visible");
     style = { overflow: "hidden", marginTop: "0.2em", visibility: "visible" };
   } else {
-    console.log("not visible");
     style = {
       overflow: "hidden",
       marginTop: "0.2em",

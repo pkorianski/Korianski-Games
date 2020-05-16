@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import {
   addSelectedCard,
   removeSelectedCard,
-} from "../../../../actions/games/palace/solo/game";
+} from "../../../../actions/games/game";
 import { connect } from "react-redux";
 
 const VisualCard = ({

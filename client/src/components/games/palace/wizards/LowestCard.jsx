@@ -14,68 +14,27 @@ import {
   updateStep,
   removeAllSelectedCards,
   updatePlayerTurn,
-} from "../../../../actions/games/palace/solo/game";
+  addStartingCards,
+} from "../../../../actions/games/game";
 
 const LowestCard = ({
   who_am_i,
   current_hand,
   cards_selected,
   step,
-  game,
-  updateStep,
-  removeAllSelectedCards,
-  updatePlayerTurn,
+  player1,
+  player2,
+  starting_card_queue,
+  current_deck,
+  addStartingCards,
 }) => {
   const [lowestOpen, setLowestOpen] = useState(true);
   const [waitingOpen, setWaitingOpen] = useState(false);
 
   const onClick = () => {
-    if (game.player1.player_name === who_am_i) {
-      // Add selected to starting card queue
-      game.addStartingCard({
-        player_id: game.player1.id,
-        card: cards_selected[0],
-      });
-    } else if (game.player2.player_name === who_am_i) {
-      // Add selected to starting card queue
-      game.addStartingCard({
-        player_id: game.player2.id,
-        card: cards_selected[0],
-      });
-    }
+    addStartingCards(player1, player2, cards_selected[0], current_deck);
     setLowestOpen(false);
-    setWaitingOpen(true);
   };
-
-  const setStartingTurn = () => {
-    if (step === 4) {
-      if (game.player2.isRobot) {
-        for (let i = 1; i < 5000; i++) {
-          continue;
-          // Need some delay here
-        }
-        game.determineRobotStartingCard();
-      }
-
-      //MULT TODO: Multiple player look at queue every 2 seconds
-      while (game.startingCardsQueue.length < 2) {
-        //MULT TODO: Multiple player look at queue every 2 seconds
-        continue;
-      }
-
-      const playerTurn = game.determineStartingTurn();
-      removeAllSelectedCards();
-      updatePlayerTurn(playerTurn);
-      updateStep(step);
-    }
-  };
-
-  useEffect(() => {
-    if (waitingOpen) {
-      setStartingTurn();
-    }
-    // eslint-disable-next-line
-  }, [waitingOpen]);
 
   return (
     <Fragment>
@@ -171,16 +130,26 @@ LowestCard.propTypes = {
   who_am_i: PropTypes.string.isRequired,
   updateStep: PropTypes.func.isRequired,
   removeAllSelectedCards: PropTypes.func.isRequired,
+  addStartingCards: PropTypes.func.isRequired,
+  starting_card_queue: PropTypes.array.isRequired,
+  current_deck: PropTypes.array.isRequired,
+  player1: PropTypes.object,
+  player2: PropTypes.object,
 };
 
 const mapStateToProps = (state) => ({
   step: state.games.palace.step,
   cards_selected: state.games.palace.cards_selected,
   who_am_i: state.games.palace.who_am_i,
+  player1: state.games.palace.game.player1,
+  player2: state.games.palace.game.player2,
+  starting_card_queue: state.games.palace.game.starting_card_queue,
+  current_deck: state.games.palace.game.current_deck,
 });
 
 export default connect(mapStateToProps, {
   updateStep,
   updatePlayerTurn,
   removeAllSelectedCards,
+  addStartingCards,
 })(LowestCard);

@@ -9,10 +9,11 @@ import {
   Container,
   InputGroup,
 } from "reactstrap";
+import delay from "lodash/delay";
 import { connect } from "react-redux";
 import { Link } from "react-router-dom";
 import faker from "faker";
-import Palace from "../../../../actions/games/palace/Palace";
+import Palace from "../../../../actions/games/Palace";
 import { random } from "../../../common";
 
 // Palace Board
@@ -31,10 +32,12 @@ import {
   setupGame,
   updateStep,
   updatePlayerTurn,
-} from "../../../../actions/games/palace/solo/game";
+} from "../../../../actions/games/game";
 
 const PalaceSoloBoard = ({
   step,
+  player1,
+  player2,
   updateStep,
   setupGame,
   playerTurn,
@@ -57,36 +60,27 @@ const PalaceSoloBoard = ({
     "Villager",
     "Werewolf",
   ];
-  let [game, setGame] = useState(null);
 
   // Game init state
   const [selectedChar, setSelectedChar] = useState(null);
   const [charModal, setCharModal] = useState(false);
   const toggleChar = () => setCharModal(!charModal);
 
-  const beginGame = () => {
-    game.set_deck();
-    game.players();
-    game.deal_cards();
-    updateStep(step);
-  };
-
   const onSubmitGame = async (e) => {
     e.preventDefault();
-    setupGame(e.target.yourPlayer.value);
-    updateStep(step);
+    const data = {
+      play_type: "solo",
+      player1: { name: e.target.yourPlayer.value, img: selectedChar.img },
+      player2: {
+        name: faker.internet.userName().slice(0, 12),
+        img: `${process.env.PUBLIC_URL}/players/${
+          characters[Math.floor(random(1, characters.length)) - 1]
+        }-icon.png`,
+      },
+    };
 
-    setGame(
-      new Palace(
-        { name: e.target.yourPlayer.value, img: selectedChar.img },
-        {
-          name: faker.internet.userName().slice(0, 12),
-          img: `${process.env.PUBLIC_URL}/players/${
-            characters[Math.floor(random(1, characters.length)) - 1]
-          }-icon.png`,
-        }
-      )
-    );
+    setupGame(data);
+    updateStep(2);
   };
 
   const initGame = () => (
@@ -137,14 +131,11 @@ const PalaceSoloBoard = ({
   );
 
   useEffect(() => {
-    if (
-      game !== null &&
-      step === 5 &&
-      playerTurn === game.player2.player_name &&
-      game.player2.isRobot
-    ) {
-      game.robotTurn();
-      updatePlayerTurn(game.player1.player_name);
+    // Robot Turn
+    if (step === 5 && playerTurn === player2.player_name && player2.isRobot) {
+      // game.robotTurn();
+
+      delay(updatePlayerTurn, 2000, player1.player_name);
     }
     // eslint-disable-next-line
   }, [playerTurn]);
@@ -154,14 +145,12 @@ const PalaceSoloBoard = ({
       <GameHeader />
 
       {step === 1 && initGame()}
-      {step === 2 && beginGame()}
       {step >= 3 && (
         <div>
-          <Board step={step} game={game} />
-          <StartGame game={game} />
+          <Board />
+          <StartGame />
           <CardController
-            current_hand={step >= 5 ? game.player1.current_hand : []}
-            game={game}
+            current_hand={step >= 5 ? player1.current_hand : []}
           />
         </div>
       )}
@@ -171,15 +160,20 @@ const PalaceSoloBoard = ({
 
 PalaceSoloBoard.propTypes = {
   step: PropTypes.number.isRequired,
+  current_hand: PropTypes.array,
   updateStep: PropTypes.func.isRequired,
   setupGame: PropTypes.func.isRequired,
   playerTurn: PropTypes.string,
   updatePlayerTurn: PropTypes.func.isRequired,
+  player1: PropTypes.object,
+  player2: PropTypes.object,
 };
 
 const mapStateToProps = (state) => ({
   step: state.games.palace.step,
   playerTurn: state.games.palace.playerTurn,
+  player1: state.games.palace.game.player1,
+  player2: state.games.palace.game.player2,
 });
 
 export default connect(mapStateToProps, {

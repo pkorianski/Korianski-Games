@@ -6,41 +6,37 @@ import VisibleCardStack from "../Board/VisibleCardStack";
 import {
   updateStep,
   removeAllSelectedCards,
-} from "../../../../actions/games/palace/solo/game";
+  pickTopThree,
+} from "../../../../actions/games/game";
 
 const TopCards = ({
+  play_type,
   who_am_i,
   current_hand,
   cards_selected,
   step,
-  game,
+  player1,
+  player2,
   updateStep,
   removeAllSelectedCards,
+  pickTopThree,
 }) => {
   const onClick = () => {
-    if (game.player1.player_name === who_am_i) {
-      game.player1.top_three_cards = cards_selected;
-      game.player1.current_hand = game.player1.current_hand.filter((card) => {
+    if (player1.player_name === who_am_i) {
+      player1.top_three_cards = cards_selected;
+      player1.current_hand = player1.current_hand.filter((card) => {
         return !cards_selected.includes(card);
       });
-    } else if (game.player2.player_name === who_am_i) {
-      game.player2.top_three_cards = cards_selected;
-      game.player2.current_hand = game.player2.current_hand.filter((card) => {
-        return !cards_selected.includes(card);
-      });
-    } else if (game.player3.player_name === who_am_i) {
-      game.player3.top_three_cards = cards_selected;
-      game.player3.current_hand = game.player3.current_hand.filter((card) => {
-        return !cards_selected.includes(card);
-      });
-    } else if (game.player.player_name === who_am_i) {
-      game.player4.top_three_cards = cards_selected;
-      game.player4.current_hand = game.player4.current_hand.filter((card) => {
+    } else if (player2.player_name === who_am_i) {
+      player2.top_three_cards = cards_selected;
+      player2.current_hand = player2.current_hand.filter((card) => {
         return !cards_selected.includes(card);
       });
     }
 
-    game.pick_top_three();
+    if (play_type === "solo") {
+      pickTopThree(player2);
+    }
     removeAllSelectedCards();
     updateStep(step);
   };
@@ -100,20 +96,29 @@ const TopCards = ({
 };
 
 TopCards.propTypes = {
+  play_type: PropTypes.string.isRequired,
   step: PropTypes.number.isRequired,
   cards_selected: PropTypes.array.isRequired,
   current_hand: PropTypes.array.isRequired,
   who_am_i: PropTypes.string.isRequired,
   updateStep: PropTypes.func.isRequired,
   removeAllSelectedCards: PropTypes.func.isRequired,
+  pickTopThree: PropTypes.func.isRequired,
+  player1: PropTypes.object,
+  player2: PropTypes.object,
 };
 
 const mapStateToProps = (state) => ({
+  play_type: state.games.palace.play_type,
   step: state.games.palace.step,
   cards_selected: state.games.palace.cards_selected,
   who_am_i: state.games.palace.who_am_i,
+  player1: state.games.palace.game.player1,
+  player2: state.games.palace.game.player2,
 });
 
-export default connect(mapStateToProps, { updateStep, removeAllSelectedCards })(
-  TopCards
-);
+export default connect(mapStateToProps, {
+  updateStep,
+  removeAllSelectedCards,
+  pickTopThree,
+})(TopCards);

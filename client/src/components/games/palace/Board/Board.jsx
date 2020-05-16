@@ -1,13 +1,10 @@
-import React from "react";
+import React, { useEffect } from "react";
 import PropTypes from "prop-types";
 import "../../../../App.css";
 import VisibleCardStack from "./VisibleCardStack";
 import { connect } from "react-redux";
 
-const Board = ({
-  step,
-  game: { current_deck, table_cards, player1, player2 },
-}) => {
+const Board = ({ step, current_deck, table_cards, player1, player2 }) => {
   const numberOfCardsLeft = () => {
     switch (current_deck.length) {
       case 1:
@@ -24,6 +21,14 @@ const Board = ({
         return "full";
     }
   };
+
+  console.log(`Table cards -> ${JSON.stringify(table_cards)}`);
+
+  useEffect(() => {
+    if (table_cards.length === 0) {
+      console.log("Table cards empty");
+    }
+  }, [table_cards.length]);
 
   return (
     <div
@@ -202,10 +207,18 @@ const Board = ({
 
 Board.propTypes = {
   step: PropTypes.number.isRequired,
+  current_deck: PropTypes.array,
+  table_cards: PropTypes.array,
+  player1: PropTypes.object,
+  player2: PropTypes.object,
 };
 
 const mapStateToProps = (state) => ({
   step: state.games.palace.step,
+  current_deck: state.games.palace.game.current_deck,
+  table_cards: state.games.palace.game.table_cards,
+  player1: state.games.palace.game.player1,
+  player2: state.games.palace.game.player2,
 });
 
 export default connect(mapStateToProps, {})(Board);
